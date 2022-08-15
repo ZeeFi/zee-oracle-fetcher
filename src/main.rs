@@ -38,16 +38,16 @@ pub enum Commands {
     /// fetch the data from Coinmarketcap
     Coinmarketcap {
         #[clap(arg_enum)]
-        currency: Currency,
-        #[clap(arg_enum, long, value_parser)]
+        coin_type: Coin,
+        #[clap(arg_enum, long, value_parser, default_value = "quote")]
         api_type: ApiType,
         #[clap(arg_enum, long, value_parser, default_value = "usd")]
         convert_to: ConvertTo,
     },
     /// fetch the data from Coingecko
-    Coingecko { currency: String },
+    Coingecko { coin_type: String },
     /// fetch the data from Binance
-    Binance { currency: String },
+    Binance { coin_type: String },
 }
 
 #[derive(Clone, clap::ArgEnum)]
@@ -57,7 +57,7 @@ pub enum ApiType {
 }
 
 #[derive(Clone, clap::ArgEnum)]
-pub enum Currency {
+pub enum Coin {
     ETH,
     BTC,
 }
@@ -70,14 +70,14 @@ pub enum ConvertTo {
 pub async fn entry(opt: Cli) -> Result<()> {
     match opt.command {
         Commands::Coinmarketcap {
-            currency,
+            coin_type,
             api_type,
             convert_to,
         } => {
-            coinmarketcap::handle_command(currency, api_type, convert_to).await?;
+            coinmarketcap::handle_command(coin_type, api_type, convert_to).await?;
             Ok(())
         }
-        Commands::Coingecko { currency: _ } => Ok(()),
-        Commands::Binance { currency: _ } => Ok(()),
+        Commands::Coingecko { coin_type: _ } => Ok(()),
+        Commands::Binance { coin_type: _ } => Ok(()),
     }
 }

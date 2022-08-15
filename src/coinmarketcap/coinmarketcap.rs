@@ -1,4 +1,4 @@
-use crate::{coinmarketcap::model::CoinmarketcapApiResponse, ApiType, ConvertTo, Currency};
+use crate::{coinmarketcap::model::CoinmarketcapApiResponse, ApiType, Coin, ConvertTo};
 use anyhow::{Error, Result};
 use reqwest;
 use std::fs::OpenOptions;
@@ -6,16 +6,16 @@ use std::io::{prelude::*, BufWriter};
 use std::{env, fmt::Display};
 
 pub async fn handle_command(
-    currency: Currency,
+    coin_type: Coin,
     api_type: ApiType,
     convert_to: ConvertTo,
 ) -> Result<()> {
-    call_api(currency, api_type, convert_to).await?;
+    call_api(coin_type, api_type, convert_to).await?;
     Ok(())
 }
 
-async fn call_api(currency: Currency, api_type: ApiType, convert_to: ConvertTo) -> Result<()> {
-    let uri_str = &build_url(currency, api_type, convert_to).unwrap()[..];
+async fn call_api(coin_type: Coin, api_type: ApiType, convert_to: ConvertTo) -> Result<()> {
+    let uri_str = &build_url(coin_type, api_type, convert_to).unwrap()[..];
     let result = fetch_quote_data(uri_str).await?;
 
     let mut coinmarketcap_data: Vec<CoinmarketcapApiResponse> = {
@@ -54,23 +54,26 @@ async fn fetch_quote_data(uri_str: &str) -> Result<CoinmarketcapApiResponse> {
     Ok(converted_result)
 }
 
-fn build_url(currency: Currency, api_type: ApiType, convert_to: ConvertTo) -> Result<String> {
+fn build_url(coin_type: Coin, api_type: ApiType, convert_to: ConvertTo) -> Result<String> {
     let api_uri = &build_api_uri(api_type).unwrap()[..];
 
-    let currency_str = match currency {
-        Currency::BTC => "btc",
-        Currency::ETH => "eth",
+    let coin_type_str = match coin_type {
+        Coin::BTC => "btc",
+        Coin::ETH => "eth",
     };
 
     let convert_to = match convert_to {
         ConvertTo::USD => "usd",
     };
 
-    warn!("The currency is :: {}", currency_str);
+    warn!("The coin_type is :: {}", coin_type_str);
     warn!("The Api type is  :: {}", api_uri);
     warn!("The convert to is :: {}", convert_to);
 
-    let api_str = format!("{}&symbol={}&convert={}", api_uri, currency_str, convert_to);
+    let api_str = format!(
+        "{}&symbol={}&convert={}",
+        api_uri, coin_type_str, convert_to
+    );
 
     Ok(api_str)
 }
