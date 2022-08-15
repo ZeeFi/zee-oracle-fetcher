@@ -50,19 +50,19 @@ pub enum Commands {
     Binance { coin_type: String },
 }
 
-#[derive(Clone, clap::ArgEnum)]
+#[derive(Clone, clap::ArgEnum, Copy)]
 pub enum ApiType {
     Quote,
     Listing,
 }
 
-#[derive(Clone, clap::ArgEnum)]
+#[derive(Clone, clap::ArgEnum, Copy)]
 pub enum Coin {
     ETH,
     BTC,
 }
 
-#[derive(Clone, clap::ArgEnum)]
+#[derive(Clone, clap::ArgEnum, Copy)]
 pub enum ConvertTo {
     USD,
 }

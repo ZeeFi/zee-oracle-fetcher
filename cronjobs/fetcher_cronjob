@@ -1,1 +1,1 @@
-*/15 * * * * root cd /home/fetcher && ./scripts/fetcher.sh > /proc/1/fd/1 2>/proc/1/fd/2
+*/1 * * * * root cd /home/fetcher &&  bash scripts/fetcher_script.sh > /proc/1/fd/1 2>/proc/1/fd/2

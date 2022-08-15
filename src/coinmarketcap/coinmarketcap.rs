@@ -1,15 +1,28 @@
 use crate::{coinmarketcap::model::CoinmarketcapApiResponse, ApiType, Coin, ConvertTo};
 use anyhow::{Error, Result};
+//use chrono::{Duration, Utc, Weekday};
 use reqwest;
 use std::fs::OpenOptions;
 use std::io::{prelude::*, BufWriter};
 use std::{env, fmt::Display};
+//use tokio::spawn;
+//use tokio_schedule::{every, Job};
 
 pub async fn handle_command(
     coin_type: Coin,
     api_type: ApiType,
     convert_to: ConvertTo,
 ) -> Result<()> {
+    // let every_30_minutes =
+    //     every(1)
+    //         .minutes()
+    //         .at(20)
+    //         .in_timezone(&Utc)
+    //         .perform(move || async move {
+    //             call_api(coin_type, api_type, convert_to).await.unwrap();
+    //         });
+    // spawn(every_30_minutes);
+
     call_api(coin_type, api_type, convert_to).await?;
     Ok(())
 }

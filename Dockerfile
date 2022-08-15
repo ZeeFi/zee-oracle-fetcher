@@ -2,13 +2,17 @@ FROM rust:1.62.1 as fetcher
 
 RUN mkdir /home/fetcher
 
-# Copy the project folder
-COPY ./cronjobs /home/fetcher/cronjobs
-
-COPY ./scripts /home/fetcher/scripts
-
 
 WORKDIR /home/fetcher
+
+# Copy the project folder
+COPY ./cronjobs ./cronjobs
+
+COPY ./scripts ./scripts
+
+COPY ./.env ./.env
+
+RUN touch coinmarketcap.json
 
 RUN cargo install --git https://github.com/valekar/fetcher.git
 
@@ -23,8 +27,11 @@ RUN apt-get -y install --reinstall rsyslog
 
 
 # Give execution rights on the cron scripts
-RUN chmod +x ./scripts/fetcher.sh
+RUN chmod +x ./scripts/fetcher_script.sh
+
+# Apply cron job
+RUN crontab /etc/cron.d/fetcher_cronjob
 
 
 # Run the fetcher
-CMD ["/bin/bash", "-c", "service rsyslog restart && ./scripts/fetcher.sh && chmod 644 /etc/cron.d/fetcher_cronjob && cron -f "]
+CMD ["/bin/bash", "-c", "service rsyslog restart && ./scripts/fetcher_script.sh && chmod 644 /etc/cron.d/fetcher_cronjob && cron -f "]
