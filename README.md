@@ -7,6 +7,11 @@ Command line interface for fetching the data. This tool is built for fetching da
 So what's the motivation behind building this CLI - This can be used to fetch any crypto value and store that into file. This can later be used to push the data into blockchain and thus acting like an oracle.
 
 
+
+## Installation
+`cargo install --git https://github.com/valekar/fetcher.git`
+
+
 ## Usage 
 The way to use this CLI is 
 
