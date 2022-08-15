@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Default)]
 pub struct CoinmarketcapApiResponse {
     pub status: Status,
     pub data: HashMap<String, Token>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Default)]
 pub struct Status {
     pub timestamp: String, // change this to i64
     pub error_code: u8,
@@ -20,7 +20,7 @@ pub struct Status {
     pub notice: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Token {
     pub id: u16,
     pub name: String,
@@ -47,7 +47,7 @@ pub struct Token {
     pub quote: HashMap<String, Currency>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Currency {
     pub price: f64,
     pub volume_24h: f64,

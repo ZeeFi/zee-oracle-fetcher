@@ -1,6 +1,8 @@
 use crate::{coinmarketcap::model::CoinmarketcapApiResponse, ApiType, ConvertTo, Currency};
 use anyhow::{Error, Result};
 use reqwest;
+use std::fs::OpenOptions;
+use std::io::{prelude::*, BufWriter};
 use std::{env, fmt::Display};
 
 pub async fn handle_command(
@@ -16,7 +18,28 @@ async fn call_api(currency: Currency, api_type: ApiType, convert_to: ConvertTo) 
     let uri_str = &build_url(currency, api_type, convert_to).unwrap()[..];
     let result = fetch_quote_data(uri_str).await?;
 
-    println!("{:?}", result);
+    let mut coinmarketcap_data: Vec<CoinmarketcapApiResponse> = {
+        let coinmarketcap_data = std::fs::read_to_string("coinmarketcap.json")?;
+
+        serde_json::from_str::<Vec<CoinmarketcapApiResponse>>(&coinmarketcap_data).unwrap_or(vec![])
+    };
+
+    // println!("{:?}", coinmarketcap_data);
+
+    coinmarketcap_data.push(result);
+
+    let file = OpenOptions::new()
+        .write(true)
+        .append(false)
+        .open("coinmarketcap.json")
+        .unwrap();
+
+    let mut writer = BufWriter::new(file);
+
+    serde_json::to_writer(&mut writer, &coinmarketcap_data)?;
+    writer.flush()?;
+
+    // println!("{:?}", result);
 
     Ok(())
 }
