@@ -1,7 +1,6 @@
-use anyhow::{Error, Result};
-
 use crate::{coinmarketcap::model::CoinmarketcapApiResponse, ApiType, ConvertTo, Currency};
-use reqwest::{self};
+use anyhow::{Error, Result};
+use reqwest;
 use std::{env, fmt::Display};
 
 pub async fn handle_command(
@@ -9,8 +8,12 @@ pub async fn handle_command(
     api_type: ApiType,
     convert_to: ConvertTo,
 ) -> Result<()> {
-    let uri_str = &build_url(currency, api_type, convert_to).unwrap()[..];
+    call_api(currency, api_type, convert_to).await?;
+    Ok(())
+}
 
+async fn call_api(currency: Currency, api_type: ApiType, convert_to: ConvertTo) -> Result<()> {
+    let uri_str = &build_url(currency, api_type, convert_to).unwrap()[..];
     let result = fetch_quote_data(uri_str).await?;
 
     println!("{:?}", result);
