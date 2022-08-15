@@ -2,7 +2,6 @@ FROM rust:1.62.1 as fetcher
 
 RUN mkdir /home/fetcher
 
-
 WORKDIR /home/fetcher
 
 # Copy the project folder
