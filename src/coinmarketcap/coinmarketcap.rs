@@ -5,6 +5,8 @@ use reqwest;
 use std::fs::OpenOptions;
 use std::io::{prelude::*, BufWriter};
 use std::{env, fmt::Display};
+
+use super::TruncatedTokenPrice;
 //use tokio::spawn;
 //use tokio_schedule::{every, Job};
 
@@ -37,6 +39,10 @@ async fn call_api(coin_type: Coin, api_type: ApiType, convert_to: ConvertTo) -> 
         serde_json::from_str::<Vec<CoinmarketcapApiResponse>>(&coinmarketcap_data).unwrap_or(vec![])
     };
 
+    let truncated_result = truncate_token_price_info(result.clone()).unwrap();
+
+    println!("{:?}", truncated_result);
+
     // println!("{:?}", coinmarketcap_data);
 
     coinmarketcap_data.push(result);
@@ -51,8 +57,6 @@ async fn call_api(coin_type: Coin, api_type: ApiType, convert_to: ConvertTo) -> 
 
     serde_json::to_writer(&mut writer, &coinmarketcap_data)?;
     writer.flush()?;
-
-    // println!("{:?}", result);
 
     Ok(())
 }
@@ -110,6 +114,20 @@ fn build_api_uri(api_type: ApiType) -> Result<String> {
     };
 
     Ok(api_uri)
+}
+
+fn truncate_token_price_info(result: CoinmarketcapApiResponse) -> Result<TruncatedTokenPrice> {
+    let token = result.data.values().next().unwrap();
+    let token_quote = token.quote.values().next().unwrap();
+
+    let truncated_token_price = TruncatedTokenPrice {
+        name: token.clone().name,
+        symbol: token.clone().symbol,
+        price: (token_quote.price * 100000000.0).round() as u128,
+        last_updated: token_quote.clone().last_updated,
+    };
+
+    Ok(truncated_token_price)
 }
 
 #[derive(Debug)]

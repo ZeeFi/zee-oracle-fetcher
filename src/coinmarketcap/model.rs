@@ -2,13 +2,13 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Deserializer, Serialize};
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Default, Clone)]
 pub struct CoinmarketcapApiResponse {
     pub status: Status,
     pub data: HashMap<String, Token>,
 }
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Default, Clone)]
 pub struct Status {
     pub timestamp: String, // change this to i64
     pub error_code: u8,
@@ -20,7 +20,7 @@ pub struct Status {
     pub notice: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Token {
     pub id: u16,
     pub name: String,
@@ -47,7 +47,7 @@ pub struct Token {
     pub quote: HashMap<String, Currency>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Currency {
     pub price: f64,
     pub volume_24h: f64,
@@ -79,4 +79,12 @@ where
     };
 
     Ok(return_value)
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct TruncatedTokenPrice {
+    pub name: String,
+    pub symbol: String,
+    pub price: u128,
+    pub last_updated: String,
 }
