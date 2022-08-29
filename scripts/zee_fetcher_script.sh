@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Running Fetcher"
+echo "Running Zee-Oracle-Fetcher"
 echo "Started at" $(date +%T)
 
 export PATH="/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
@@ -8,7 +8,7 @@ export PATH="/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/
 # wait 
 
 
-result_2= `fetcher coinmarketcap eth --api-type quote`
+result_2= `zee-oracle-fetcher coinmarketcap eth --api-type quote --config-oath ".aptos/config.yaml"`
 wait 
 echo $result_2
 

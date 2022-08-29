@@ -1,6 +1,6 @@
 version: "3.4"
 services:
-  fetcher:
+  zee-fetcher:
     build:
       context: .
-      target: fetcher
+      target: zee-fetcher

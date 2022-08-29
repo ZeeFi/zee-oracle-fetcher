@@ -1,6 +1,12 @@
 use crate::{coinmarketcap::model::CoinmarketcapApiResponse, ApiType, Coin, ConvertTo};
 use anyhow::{Error, Result};
+use oracle_sdk::{oracle, OracleClient, OracleConfig};
 //use chrono::{Duration, Utc, Weekday};
+use aptos_sdk::rest_client::{
+    self,
+    //FaucetClient,
+    Transaction,
+};
 use reqwest;
 use std::fs::OpenOptions;
 use std::io::{prelude::*, BufWriter};
@@ -14,6 +20,7 @@ pub async fn handle_command(
     coin_type: Coin,
     api_type: ApiType,
     convert_to: ConvertTo,
+    config_path: String,
 ) -> Result<()> {
     // let every_30_minutes =
     //     every(1)
@@ -25,11 +32,16 @@ pub async fn handle_command(
     //         });
     // spawn(every_30_minutes);
 
-    call_api(coin_type, api_type, convert_to).await?;
+    call_api(coin_type, api_type, convert_to, config_path).await?;
     Ok(())
 }
 
-async fn call_api(coin_type: Coin, api_type: ApiType, convert_to: ConvertTo) -> Result<()> {
+async fn call_api(
+    coin_type: Coin,
+    api_type: ApiType,
+    convert_to: ConvertTo,
+    config_path: String,
+) -> Result<()> {
     let uri_str = &build_url(coin_type, api_type, convert_to).unwrap()[..];
     let result = fetch_quote_data(uri_str).await?;
 
@@ -42,6 +54,8 @@ async fn call_api(coin_type: Coin, api_type: ApiType, convert_to: ConvertTo) -> 
     let truncated_result = truncate_token_price_info(result.clone()).unwrap();
 
     println!("{:?}", truncated_result);
+
+    send_to_blockchain(&truncated_result, config_path).await?;
 
     // println!("{:?}", coinmarketcap_data);
 
@@ -128,6 +142,49 @@ fn truncate_token_price_info(result: CoinmarketcapApiResponse) -> Result<Truncat
     };
 
     Ok(truncated_token_price)
+}
+
+async fn send_to_blockchain(
+    truncated_result: &TruncatedTokenPrice,
+    config_path: String,
+) -> Result<()> {
+    let oracle_client = OracleClient::new(rest_client::Client::new(oracle::NODE_URL.clone()));
+
+    let default_account = &mut OracleConfig::load_default_account(&oracle_client, &config_path)
+        .await
+        .unwrap();
+
+    let result_client = oracle_client
+        .api_client
+        .get_account_balance(default_account.address())
+        .await?
+        .inner()
+        .get();
+
+    println!("The balance is {}", result_client);
+
+    let pending_transaction = oracle_client
+        .add_feed(
+            default_account.address(),
+            default_account,
+            &truncated_result.symbol,
+            truncated_result.price,
+            8,
+            &truncated_result.last_updated,
+            None,
+        )
+        .await
+        .unwrap()
+        .into_inner();
+
+    let transaction_result: Transaction = oracle_client
+        .api_client
+        .wait_for_transaction(&pending_transaction)
+        .await?
+        .into_inner();
+
+    println!("The transaction is {}", transaction_result.success());
+    Ok(())
 }
 
 #[derive(Debug)]

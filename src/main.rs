@@ -43,6 +43,8 @@ pub enum Commands {
         api_type: ApiType,
         #[clap(arg_enum, long, value_parser, default_value = "usd")]
         convert_to: ConvertTo,
+        #[clap(arg_enum, long, value_parser)]
+        config_path: String,
     },
     /// fetch the data from Coingecko
     Coingecko { coin_type: String },
@@ -73,8 +75,9 @@ pub async fn entry(opt: Cli) -> Result<()> {
             coin_type,
             api_type,
             convert_to,
+            config_path,
         } => {
-            coinmarketcap::handle_command(coin_type, api_type, convert_to).await?;
+            coinmarketcap::handle_command(coin_type, api_type, convert_to, config_path).await?;
             Ok(())
         }
         Commands::Coingecko { coin_type: _ } => Ok(()),

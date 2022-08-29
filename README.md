@@ -17,7 +17,7 @@ The way to use this CLI is
 
 ```bash
 1. USAGE:
-    fetcher <SUBCOMMAND>
+    zee-oracle-fetcher <SUBCOMMAND>
 
 OPTIONS:
     -h, --help       Print help information
@@ -32,20 +32,23 @@ SUBCOMMANDS:
 #############################################################################################
 
 2. USAGE:
-    fetcher coinmarketcap [OPTIONS] --api-type <API_TYPE> <CURRENCY>
+    zee-oracle-fetcher coinmarketcap [OPTIONS] --api-type <API_TYPE> <CURRENCY> --config-ath <path_string>
 ```
 
 
 ### Example 
 
 1. Run the following command to fetch the data eth data using the quote URL from coinmarketcap
-    `fetcher coinmarketcap eth --api-type quote`     
+    `zee-oracle-fetcher coinmarketcap eth --api-type quote --config-path "./.aptos/config.yaml"`     
 
 
 ### Supported Markets
 
-This currently supports `eth` and `btc`. And the API supported is `coinmarketcap`  . You could fetch the data from any `api` data provider
+This currently supports `eth` and `btc`. And the API supported is `coinmarketcap`  . You could fetch the data from any `api` data provider. 
 
+
+### Config Path
+Pass the config path for sending the data to blockchain
 
 
 ### Docker Image
