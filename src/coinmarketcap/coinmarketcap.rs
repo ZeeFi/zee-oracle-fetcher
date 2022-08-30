@@ -170,7 +170,7 @@ async fn send_to_blockchain(
             &truncated_result.symbol,
             truncated_result.price,
             8,
-            &truncated_result.last_updated,
+            &truncated_result.last_updated.to_string(),
             None,
         )
         .await

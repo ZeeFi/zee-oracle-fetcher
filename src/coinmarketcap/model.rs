@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use chrono::DateTime;
 use serde::{Deserialize, Deserializer, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Default, Clone)]
@@ -63,7 +64,8 @@ pub struct Currency {
     pub fully_diluted_market_cap: f64,
     #[serde(deserialize_with = "deserialize_null_default")]
     pub tvl: String,
-    pub last_updated: String, // change this to i64
+    #[serde(deserialize_with = "deserialize_string_to_date")]
+    pub last_updated: i64, // change this to i64
 }
 
 fn deserialize_null_default<'de, D, T>(deserializer: D) -> Result<T, D::Error>
@@ -81,10 +83,21 @@ where
     Ok(return_value)
 }
 
+fn deserialize_string_to_date<'de, D>(deserializer: D) -> Result<i64, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s = <String>::deserialize(deserializer)?;
+
+    let datetime = DateTime::parse_from_rfc3339(&s).unwrap();
+
+    Ok(datetime.timestamp())
+}
+
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct TruncatedTokenPrice {
     pub name: String,
     pub symbol: String,
     pub price: u128,
-    pub last_updated: String,
+    pub last_updated: i64,
 }
